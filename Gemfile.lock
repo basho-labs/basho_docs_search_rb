@@ -1,0 +1,24 @@
+GEM
+  remote: http://rubygems.org/
+  specs:
+    faraday (0.8.4)
+      multipart-post (~> 1.1)
+    i18n (0.6.1)
+    multi_json (1.3.6)
+    multipart-post (1.1.5)
+    slim (1.3.2)
+      temple (~> 0.5.0)
+      tilt (~> 1.3.3)
+    temple (0.5.4)
+    tilt (1.3.3)
+    webmachine (1.0.0)
+      i18n (>= 0.4.0)
+      multi_json
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  faraday
+  slim
+  webmachine

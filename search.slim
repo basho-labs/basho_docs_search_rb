@@ -1,0 +1,53 @@
+doctype html
+/[if lt IE 7]
+  html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"
+/[if IE 7]
+  html class="no-js lt-ie9 lt-ie8" lang="en"
+/[if IE 8]
+  html class="no-js lt-ie9" lang="en"
+/![if gt IE 8]>
+  <!--> <html class="no-js" lang="en"> <!--<![endif]
+head
+  meta charset="utf-8"
+  meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"
+  meta content="width=device-width" name="viewport"
+  meta content="project" name='riak'
+  meta content="version" name='1.2.0+'
+  title Riak Document Search
+  link href=="http://docs.basho.com/shared/1.2.0/css/all.css" media="screen" rel="stylesheet" type="text/css"
+  css:
+    .results em {
+      background-color:yellow;
+    }
+body.riak
+  aside#nav-container role="complementary"
+    nav.overview#primary-nav role="nav"
+      h2.responsive-link
+        | Navigation
+        a.responsive-toggle
+      h3.responsive-link.visit-basho
+        a href="http://www.basho.com" Visit Basho
+      h3.responsive-link
+        a href="./index.html" Home
+  div(role="main")
+    header.masthead
+      div#top-nav
+        a href="http://docs.basho.com" Home
+        a href="http://www.basho.com" Basho
+      a.responsive-toggle
+      a.logo
+        h1 Riak Doc Search
+      span.tagline Product tutorials, how-to's, and fully-documented APIs.
+      img.shadow-divider(src="http://docs.basho.com/shared/1.2.0/images/layout/shadow-divider.png")
+    article.mainarticle
+      header
+        h1 Search
+      form action="/" method="get"
+        input name="q" value=query
+        input type="submit"
+      h3 Results
+      ul.results
+        - links.each do |link|
+          li==link
+    footer.mastfooter Copyright &copy; #{Date.today.year} Basho Technologies inc
+| </html>
