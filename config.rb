@@ -9,7 +9,7 @@ SearchApp = Webmachine::Application.new do |app|
   end
 
   app.configure do |config|
-    config.ip = '127.0.0.1'
+    config.ip = '0.0.0.0'
     config.port = ENV['PORT'] || 3000
     # config.adapter = :Mongrel
   end
