@@ -135,8 +135,9 @@ body.riak
             - if total_pages != current_page
               li.next
                 a(href=="?q=#{CGI::escape(query)}&page=#{current_page + 1}") Next
-        .total
-          = total_results
-          | &nbsp; Results
+        - if query != ''
+          .total
+            = total_results
+            | &nbsp; Results
     footer.mastfooter Copyright &copy; #{Date.today.year} Basho Technologies inc
 | </html>
