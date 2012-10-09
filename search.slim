@@ -15,20 +15,82 @@ head
   meta content="version" name='1.2.0+'
   title Riak Document Search
   link href=="http://docs.basho.com/shared/1.2.0/css/all.css" media="screen" rel="stylesheet" type="text/css"
+  script src=="http://docs.basho.com/shared/1.2.0/js/all.js"
   css:
+    ol.results {
+      list-style: none;
+      margin: 10px;
+      padding: 0;
+      width:100%;
+    }
+    ol.results li {
+      margin-bottom:1em;
+    }
+    ol.results li .text {
+      color:#666;
+    }
     .results em {
-      background-color:yellow;
+      background-color:#FFD97C;
+      font-style:normal;
+      font-weight:bold;
+      color:black;
+    }
+    .pages ol {
+      list-style: none;
+      margin: 10px;
+      padding: 0;
+      float:left;
+      width:100%;
+    }
+    .pages ol li {
+      float:left;
+    }
+    .pages ol li.prev {
+      border-right:1px solid #CCC;
+    }
+    .pages ol li.next {
+      border-left:1px solid #CCC;
+    }
+    .pages ol li a {
+      padding: 10px;
+    }
+    .pages ol li a.current {
+      border:1px solid #FAA94C;
+      background-color: #FFD97C;
+    }
+    .pages .total {
+      font-style:italic;
+      font-size:80%;
+      color:#666;
+      margin-left: 20px;
+      border-top: 1px dashed #CCC;
     }
 body.riak
   aside#nav-container role="complementary"
     nav.overview#primary-nav role="nav"
       h2.responsive-link
         | Navigation
-        a.responsive-toggle
+        span.responsive-toggle
       h3.responsive-link.visit-basho
         a href="http://www.basho.com" Visit Basho
       h3.responsive-link
         a href="./index.html" Home
+      h3
+        span All Riak Projects
+      ul.depth-1
+        li
+          a(href="http://docs.basho.com/riak/latest/") Riak
+        li
+          a(href="http://docs.basho.com/riakee/latest/") Riak Enterprise
+        li
+          a(href="http://docs.basho.com/riakcs/latest/") Riak CS
+      h3
+        span Shortcuts
+      ul.depth-1
+        li
+          a(href="http://docs.basho.com/riak/latest/cookbooks/faqs/") FAQs
+        li
+          a(href="http://docs.basho.com/riak/latest/references/apis/") APIs
   div(role="main")
     header.masthead
       div#top-nav
@@ -40,14 +102,41 @@ body.riak
       span.tagline Product tutorials, how-to's, and fully-documented APIs.
       img.shadow-divider(src="http://docs.basho.com/shared/1.2.0/images/layout/shadow-divider.png")
     article.mainarticle
+      div#nav-toggle
       header
         h1 Search
       form action="/" method="get"
         input name="q" value=query
         input type="submit"
-      h3 Results
-      ul.results
+      h3 
+      ol.results
         - links.each do |link|
-          li==link
+          li
+            a(href=link[:link])=link[:title]
+            .text==link[:text]
+      .pages
+        - if total_pages > 1
+          ol
+            - if current_page > 1
+              li.prev
+                a(href=="?q=#{CGI::escape(query)}&page=#{current_page - 1}") Prev
+            - range = total_pages > TOTAL_PAGES ? TOTAL_PAGES : total_pages
+            - start_shift = (TOTAL_PAGES / 2).to_i
+            - first = current_page - start_shift
+            - first = first < 1 ? 1 : first
+            - last = (total_pages > TOTAL_PAGES ? TOTAL_PAGES : total_pages) + first
+            - if last > total_pages
+              - last = total_pages + 1
+              - first = last - range if (last - first) < range
+            - (first...last).each do |page|
+              - class_name = page == current_page ? 'current' : ''
+              li
+                a(class=class_name href=="?q=#{CGI::escape(query)}&page=#{page}") #{page}
+            - if total_pages != current_page
+              li.next
+                a(href=="?q=#{CGI::escape(query)}&page=#{current_page + 1}") Next
+        .total
+          = total_results
+          | &nbsp; Results
     footer.mastfooter Copyright &copy; #{Date.today.year} Basho Technologies inc
 | </html>
