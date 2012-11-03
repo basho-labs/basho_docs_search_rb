@@ -33,7 +33,8 @@ class SearchResource < Webmachine::Resource
 
       response = conn.get '/search/riakdoc2', {
         wt: 'json',
-        q: "text_t:#{query}",
+        q: "#{query}",
+        df: "text_t",
         omitHeader: 'true',
         hl: 'true',
         start: start,
