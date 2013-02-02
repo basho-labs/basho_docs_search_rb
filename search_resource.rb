@@ -20,6 +20,9 @@ class SearchResource < Webmachine::Resource
     links = []
     if query != ''
 
+      # If there's a forward slash, quote it
+      query = "\"#{query}\"" if query.scan("/").length > 0
+
       base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
       docs_url = 'http://docs.basho.com'
 
