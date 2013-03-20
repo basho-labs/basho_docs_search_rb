@@ -39,12 +39,12 @@ class SearchResource < Webmachine::Resource
       response = conn.get '/search/riakdoc2', {
         wt: 'json',
         q: "#{query}",
-        df: "text_t",
+        df: "body_en",
         omitHeader: 'true',
         hl: 'true',
         start: start,
         rows: PER_PAGE,
-        :'hl.fl' => 'text_t',
+        :'hl.fl' => 'body_en',
         fl: 'id,_yz_rk,score'
       }
 
