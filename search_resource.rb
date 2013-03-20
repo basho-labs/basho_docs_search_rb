@@ -62,7 +62,7 @@ class SearchResource < Webmachine::Resource
         key = doc['_yz_rk']
         title = key.sub(/(\/)$/, '').scan(/[^\/]+$/).first.to_s.gsub(/[\-]/, ' ').titleize
         link = docs_url + key
-        text = (hl['text_t'] || []).first.to_s
+        text = (hl['body_en'] || []).first.to_s
         text.gsub!(/(\<[^>]+?\>)/) do
           (tag = $1) =~ /(\<\/?em\>)/ ? $1 : ''
         end
