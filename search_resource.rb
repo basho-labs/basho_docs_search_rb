@@ -6,13 +6,26 @@ require 'titleize'
 
 PER_PAGE = 10
 TOTAL_PAGES = 10
-Search = Struct.new(:query, :links, :current_page, :total_pages, :total_results)
+Search = Struct.new(:query, :project, :links, :current_page, :total_pages, :total_results, :choices)
 
 class SearchResource < Webmachine::Resource
 
+  def choices
+    {
+      'Documentation' => [
+        ['', 'All Docs'],
+        ['riak','Riak'],
+        ['riakcs','Riak CS'],
+        ['riakee','Riak Enterprise']
+      ]
+    }
+  end
+
   def to_html
     params = CGI::parse(request.uri.query.to_s) || {}
-    query = params['q'].first.to_s.strip
+    query = params['q'].first.to_s.gsub(/[,\:]/,' ').strip
+    project = params['p'].first.to_s.strip
+    project = nil if project == '' || !%w{riak riakee riakcs}.include?(project)
     current_page = params['page'].first.to_i
     current_page = 1 if current_page < 1
     
@@ -25,7 +38,8 @@ class SearchResource < Webmachine::Resource
         query = "\"#{query.gsub(/(^\")|(\")$/, '')}\""
       end
 
-      base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
+      # base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
+      base_url = "http://localhost:10018"
       docs_url = 'http://docs.basho.com'
 
       conn = Faraday.new(:url => base_url) do |faraday|
@@ -36,16 +50,25 @@ class SearchResource < Webmachine::Resource
 
       start = (current_page - 1) * PER_PAGE
 
-      response = conn.get '/search/riakdoc2', {
+      q = ''
+      unless project.nil?
+        q = "project_s:#{project} AND "
+      end
+      q += query.split(/ /).map{|x| "text_en:#{x}"}.join(' AND ')
+      # q += "text_en:#{query}"
+
+      # response = conn.get '/search/riakdoc2', {
+      response = conn.get '/search/rdt1', {
         wt: 'json',
-        q: "#{query}",
-        df: "body_en",
+        q: q,
+        # df: "text_en",
+        sort: 'score desc',
         omitHeader: 'true',
         hl: 'true',
         start: start,
         rows: PER_PAGE,
-        :'hl.fl' => 'body_en',
-        fl: 'id,_yz_rk,score'
+        :'hl.fl' => 'text_en',
+        fl: '_yz_id,_yz_rk,project_s,title_s,score'
       }
 
       reply = JSON.parse(response.body)
@@ -57,25 +80,30 @@ class SearchResource < Webmachine::Resource
 
       count = 0
       docs.each do |doc|
-        id = doc['id']
+        id = doc['_yz_id']
         hl = highlights[id]
         key = doc['_yz_rk']
-        title = key.sub(/(\/)$/, '').scan(/[^\/]+$/).first.to_s.gsub(/[\-]/, ' ').titleize
+        proj = doc['project_s']
+        title = doc['title_s']
+        if title.nil? || title == ''
+          title = key.sub(/(\/)$/, '').scan(/[^\/]+$/).first.to_s.gsub(/[\-]/, ' ').titleize
+        end
         link = docs_url + key
-        text = (hl['body_en'] || []).first.to_s
+        text = (hl['text_en'] || []).first.to_s
         text.gsub!(/(\<[^>]+?\>)/) do
           (tag = $1) =~ /(\<\/?em\>)/ ? $1 : ''
         end
         links << {
           text: text,
           link: link,
-          title: title
+          title: title,
+          project: proj
         }
         count +=1
       end
     end
 
-    search = Search.new(query, links, current_page, total_pages, total)
+    search = Search.new(query, project, links, current_page, total_pages, total, choices)
     Slim::Template.new('search.slim', {}).render(search)
   end
 end
