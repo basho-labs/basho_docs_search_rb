@@ -6,7 +6,7 @@ require 'titleize'
 
 PER_PAGE = 10
 TOTAL_PAGES = 10
-Search = Struct.new(:query, :project, :links, :current_page, :total_pages, :total_results, :choices)
+Search = Struct.new(:query, :project, :links, :current_page, :total_pages, :total_results, :choices, :is404)
 
 class SearchResource < Webmachine::Resource
 
@@ -22,6 +22,7 @@ class SearchResource < Webmachine::Resource
   end
 
   def to_html
+    is404 = request.uri.path.to_s =~ /\/404/
     params = CGI::parse(request.uri.query.to_s) || {}
     query = params['q'].first.to_s.gsub(/[,\:]/,' ').strip
     project = params['p'].first.to_s.strip
@@ -33,14 +34,7 @@ class SearchResource < Webmachine::Resource
     links = []
     if query != ''
 
-      # If there's a forward slash, quote it
-      # if query.scan("/").length > 0
-      #   query = "\"#{query.gsub(/(^\")|(\")$/, '')}\""
-      # end
-
-      # base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
       base_url = 'http://208.118.230.104:8098'
-      # base_url = "http://localhost:10018"
       docs_url = 'http://docs.basho.com/'
 
       conn = Faraday.new(:url => base_url) do |faraday|
@@ -102,7 +96,7 @@ class SearchResource < Webmachine::Resource
       end
     end
 
-    search = Search.new(query, project, links, current_page, total_pages, total, choices)
+    search = Search.new(query, project, links, current_page, total_pages, total, choices, is404)
     Slim::Template.new('search.slim', {}).render(search)
   end
 end

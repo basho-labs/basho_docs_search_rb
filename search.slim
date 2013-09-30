@@ -77,6 +77,9 @@ head
     input[name=q] {
       margin: 10px;
     }
+    #search-404 {
+      color: #333;
+    }
     input[type=submit] {
       background: #666666;
       margin: 10px;
@@ -166,6 +169,17 @@ body.riak
     
     article.mainarticle
       h2 Riak Doc Search
+
+      - if is404
+        <div class="404container">
+          <p>Sorry, but the page you were trying to view isn't here.</p>
+          <p>It looks like this was the result of either:</p>
+          <ul>
+            <li>a mistyped address</li>
+            <li>an out-of-date link</li>
+          </ul>
+          <p>How about searching for the doc here?</p>
+        </div>
 
       form action="/" method="get"
         input#search-404 name="q" placeholder="Search" type="search" value=query
