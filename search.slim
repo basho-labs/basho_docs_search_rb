@@ -12,10 +12,10 @@ head
   meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"
   meta content="width=device-width" name="viewport"
   meta content="project" name='riak'
-  meta content="version" name='1.3.1+'
+  meta content="version" name='1.4.1+'
   title Riak Document Search
-  link href=="http://docs.basho.com/shared/1.3.1/css/all.css" media="screen" rel="stylesheet" type="text/css"
-  script src=="http://docs.basho.com/shared/1.3.1/js/all.js"
+  link href=="http://docs.basho.com/shared/1.4.1/css/all.css" media="screen" rel="stylesheet" type="text/css"
+  script src=="http://docs.basho.com/shared/1.4.1/js/all.js"
   css:
     ol.results {
       list-style: none;
@@ -71,56 +71,110 @@ head
       background: none;
       padding-right: 0px;
     }
+    select {
+      margin: 10px;
+    }
+    input[name=q] {
+      margin: 10px;
+    }
+    input[type=submit] {
+      background: #666666;
+      margin: 10px;
+      padding: 2px 8px 2px 8px;
+      border: 0;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      color: rgba(255,255,255,0.9);
+    }
+    input[type=submit]:hover {
+      background: #999999;
+    }
 body.riak
-  aside#nav-container role="complementary"
-    nav.overview#primary-nav role="nav"
-      h2.responsive-link
-        | Navigation
-        span.responsive-toggle
-      h3.responsive-link.visit-basho
-        a href="http://www.basho.com" Visit Basho
-      h3.responsive-link
-        a href="./index.html" Home
-      h3.active.shortcuts
-        span Shortcuts
-      ul.depth-1.active.shortcuts
-        li
-          a(href="http://docs.basho.com/riak/latest/cookbooks/faqs/") FAQs
-        li
-          a(href="http://docs.basho.com/riak/latest/references/apis/") APIs
-      h3.active.start
-        span Projects
-      ul.depth-1.active.start
-        li
-          a(href="http://docs.basho.com/riak/latest/") Riak
-        li
-          a(href="http://docs.basho.com/riakee/latest/") Riak Enterprise
-        li
-          a(href="http://docs.basho.com/riakcs/latest/") Riak CS
+  aside#nav-container(role="complementary")
+    nav.overview#primary-nav(role="nav")
+      #primary-nav-content
+        h2.responsive-link
+          a.responsive-toggle
+        form(action="http://search.basho.com")
+          .nav-field-container
+            #icon-container-search
+              .icon-container
+                span.nav-icon.nav-icon-search(aria-hidden="true" data-icon="&#xf002;")
+              span.separator &#124;
+            input#main-search(name="q" placeholder="Search" size="5" type="search")
+        .clear
+        h3.responsive-link.visit-basho
+          a(href="http://www.basho.com")
+            .icon-container
+              span.nav-icon(aria-hidden="true" data-icon="&#xe003;")
+            span.separator &#124;
+            span.menu-title Visit Basho
+            .clear
+        h3.responsive-link
+          a(href="http://docs.basho.com/")
+            .icon-container
+              span.nav-icon(aria-hidden="true" data-icon="&#xe003;")
+            span.separator &#124;
+            span.menu-title All Riak Projects
+            .clear
+        h3.active.start
+          .icon-container
+            span.nav-icon(aria-hidden="true" data-icon="&#xf0e7;")
+          span.separator &#124;
+          span.menu-title Start Here
+          .clear
+        ul.depth-1.start.active
+          li
+            a.riak(href="http://docs.basho.com/riak/latest/") Start Here
+          li
+            a.riak(href="http://docs.basho.com/riak/latest/theory/why-riak/") Why Riak?
+          li
+            a.riak(href="http://docs.basho.com/riak/latest/downloads/") Download Riak
+          li
+            a.riak(href="http://docs.basho.com/riak/latest/quickstart/") Five Minute Install
+
   div(role="main")
     header.masthead
-      div#top-nav
-        form action="http://search.basho.com"
-          input size="5" type="search" placeholder="Search" name="q"
-        a href="http://docs.basho.com" Home
-        a href="http://www.basho.com" Basho
-      a.responsive-toggle
-      a.logo
-        h1 Riak Doc Search
-      span.tagline Product tutorials, how-to's, and fully-documented APIs.
-      img.shadow-divider(src="http://docs.basho.com/shared/1.2.0/images/layout/shadow-divider.png")
+      #header
+        #ricon-temp-banner
+          .temp-banner-text RICON West, Basho's developer conference, is happening October 29-30th in San Francisco. <a class="register" href="http://ricon-west-2013.eventbrite.com/">Register Here</a>
+        #header-inner
+          .icon-reorder#nav-toggle
+          #top-nav
+            a(href="http://docs.basho.com/riak/latest/downloads/")
+              span.icon-download-alt
+              | Downloads
+            #nav-more
+              span.icon-more
+          a.responsive-toggle
+          a.logo(href="/index.html")
+            h1 Riak Docs
+          span.tagline Product tutorials, how-tos, and fully-documented APIs.
+          #nav-menu
+            h2 Links
+            ul
+              li
+                a href="http://docs.basho.com/" Docs Home
+              li
+                a href="http://basho.com/" Basho Website
+            #nav-menu-arrow
+            #nav-menu-arrow-back
+          .clear
+          .header-rule
+    a#ricon-temp-banner-responsive href="http://ricon-west-2013.eventbrite.com/" Register for RICON West
+    
     article.mainarticle
-      div#nav-toggle
-      header
-        h1 Search
+      h2 Riak Doc Search
+
       form action="/" method="get"
-        input name="q" value=query
+        input name="q" placeholder="Search" type="search" value=query
         select name="p"
           - choices.each do |group, projects|
             optgroup label=group
               - projects.each do |proj|
                 option(value=proj[0] selected=(proj[0]==project))==proj[1]
-        input type="submit"
+        input type="submit" value="Search"
       h3 
       ol.results
         - links.each do |link|
@@ -152,5 +206,6 @@ body.riak
           .total
             = total_results
             | &nbsp; Results
-    footer.mastfooter Copyright &copy; #{Date.today.year} Basho Technologies inc
+
+    footer.mastfooter This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 Unported License</a><br>© 2011-2013 <a href="http://www.basho.com">Basho Technologies, Inc.</a>
 | </html>

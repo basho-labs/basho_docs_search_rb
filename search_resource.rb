@@ -39,36 +39,40 @@ class SearchResource < Webmachine::Resource
       end
 
       # base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
-      base_url = "http://localhost:10018"
-      docs_url = 'http://docs.basho.com'
+      base_url = 'http://208.118.230.104:8098'
+      # base_url = "http://localhost:10018"
+      docs_url = 'http://docs.basho.com/'
 
       conn = Faraday.new(:url => base_url) do |faraday|
         faraday.request  :url_encoded             # form-encode POST params
-        # faraday.response :logger                  # log requests to STDOUT
+        # faraday.response :logger                # log requests to STDOUT
         faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
       end
 
       start = (current_page - 1) * PER_PAGE
 
+      language = 'en'
+      body_field = "body_#{language}"
+
       q = ''
       unless project.nil?
         q = "project_s:#{project} AND "
       end
-      q += query.split(/ /).map{|x| "text_en:#{x}"}.join(' AND ')
+      q += query.split(/ /).map{|x| x}.join(' AND ')
       # q += "text_en:#{query}"
 
-      # response = conn.get '/search/riakdoc2', {
-      response = conn.get '/search/rdt1', {
+      response = conn.get '/search/docs', {
         wt: 'json',
         q: q,
-        # df: "text_en",
+        df: body_field,
         sort: 'score desc',
-        omitHeader: 'true',
+        omitHeader: true,
         hl: 'true',
         start: start,
         rows: PER_PAGE,
-        :'hl.fl' => 'text_en',
-        fl: '_yz_id,_yz_rk,project_s,title_s,score'
+        defType: 'edismax',
+        :'hl.fl' => body_field,
+        fl: '_yz_id,_yz_rk,project_s,title_s,path_s,audience_s,score'
       }
 
       reply = JSON.parse(response.body)
@@ -82,14 +86,10 @@ class SearchResource < Webmachine::Resource
       docs.each do |doc|
         id = doc['_yz_id']
         hl = highlights[id]
-        key = doc['_yz_rk']
         proj = doc['project_s']
         title = doc['title_s']
-        if title.nil? || title == ''
-          title = key.sub(/(\/)$/, '').scan(/[^\/]+$/).first.to_s.gsub(/[\-]/, ' ').titleize
-        end
-        link = docs_url + key
-        text = (hl['text_en'] || []).first.to_s
+        link = docs_url + doc['path_s']
+        text = (hl[body_field] || []).first.to_s
         text.gsub!(/(\<[^>]+?\>)/) do
           (tag = $1) =~ /(\<\/?em\>)/ ? $1 : ''
         end
