@@ -168,7 +168,7 @@ body.riak
       h2 Riak Doc Search
 
       form action="/" method="get"
-        input name="q" placeholder="Search" type="search" value=query
+        input#search-404 name="q" placeholder="Search" type="search" value=query
         select name="p"
           - choices.each do |group, projects|
             optgroup label=group

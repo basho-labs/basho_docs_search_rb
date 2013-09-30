@@ -34,9 +34,9 @@ class SearchResource < Webmachine::Resource
     if query != ''
 
       # If there's a forward slash, quote it
-      if query.scan("/").length > 0
-        query = "\"#{query.gsub(/(^\")|(\")$/, '')}\""
-      end
+      # if query.scan("/").length > 0
+      #   query = "\"#{query.gsub(/(^\")|(\")$/, '')}\""
+      # end
 
       # base_url = 'http://ec2-54-242-92-147.compute-1.amazonaws.com:8098'
       base_url = 'http://208.118.230.104:8098'
@@ -59,7 +59,6 @@ class SearchResource < Webmachine::Resource
         q = "project_s:#{project} AND "
       end
       q += query.split(/ /).map{|x| x}.join(' AND ')
-      # q += "text_en:#{query}"
 
       response = conn.get '/search/docs', {
         wt: 'json',
@@ -88,7 +87,7 @@ class SearchResource < Webmachine::Resource
         hl = highlights[id]
         proj = doc['project_s']
         title = doc['title_s']
-        link = docs_url + doc['path_s']
+        link = docs_url + doc['path_s'].to_s
         text = (hl[body_field] || []).first.to_s
         text.gsub!(/(\<[^>]+?\>)/) do
           (tag = $1) =~ /(\<\/?em\>)/ ? $1 : ''
